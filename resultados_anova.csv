@@ -1,0 +1,6 @@
+Métrica,Estatística F,P-valor,Interpretação
+Idade do Repositório (dias),83.44408367684754,2.7635554914492238e-12,Há diferença significativa entre as organizações
+Total de Issues,6.445085713437705,0.005148979111078246,Há diferença significativa entre as organizações
+Pull Requests Aceitas,11.440497615784462,0.00025193402854877,Há diferença significativa entre as organizações
+Total de Releases,6.209732851074945,0.006043881129615426,Há diferença significativa entre as organizações
+Dias desde Última Atualização,3.3194888178913735,0.05140829214698806,Não há diferença significativa entre as organizações

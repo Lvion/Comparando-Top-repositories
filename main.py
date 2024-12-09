@@ -1,7 +1,9 @@
 import requests
 from datetime import datetime
 import csv
-from typing import List, Dict
+from typing import List, Dict, Tuple
+import pandas as pd
+from scipy import stats
 
 def get_top_repos_data(orgs: List[str] = ["facebook", "microsoft", "google"]) -> List[Dict]:
     """
@@ -9,7 +11,7 @@ def get_top_repos_data(orgs: List[str] = ["facebook", "microsoft", "google"]) ->
     e retorna suas informações detalhadas
     """
     print("Iniciando coleta de dados dos repositórios...")
-    github_token = "SEU_TOKEN_AQUI"
+    github_token = "SUA_CHAVE_AQUI"
     
     headers = {
         "Authorization": f"Bearer {github_token}",
@@ -116,5 +118,77 @@ def get_top_repos_data(orgs: List[str] = ["facebook", "microsoft", "google"]) ->
     print("Dados salvos em 'repositorios_top10.csv'")
     return all_repos
 
+def realizar_testes_anova(dados_csv: str = 'repositorios_top10.csv') -> Dict[str, Tuple[float, float, str]]:
+    """
+    Realiza testes ANOVA para cada métrica entre as organizações
+    
+    Returns:
+        Dict com resultados dos testes (estatística F, p-valor e interpretação)
+    """
+    print("\nRealizando testes ANOVA...")
+    
+    # Lê o CSV com os dados
+    df = pd.read_csv(dados_csv)
+    
+    # Converte datas para calcular idade e tempo desde última atualização
+    # Força todas as datas para UTC
+    df['data_criação'] = pd.to_datetime(df['data_criação']).dt.tz_localize(None)
+    df['última_atualização'] = pd.to_datetime(df['última_atualização']).dt.tz_localize(None)
+    hoje = pd.Timestamp.now().tz_localize(None)
+    
+    # Calcula idade em dias
+    df['idade_dias'] = (hoje - df['data_criação']).dt.days
+    df['dias_ultima_atualizacao'] = (hoje - df['última_atualização']).dt.days
+    
+    # Métricas a serem analisadas
+    metricas = {
+        'idade_dias': 'Idade do Repositório (dias)',
+        'total_issues': 'Total de Issues',
+        'pull_requests_aceitas': 'Pull Requests Aceitas',
+        'total_releases': 'Total de Releases',
+        'dias_ultima_atualizacao': 'Dias desde Última Atualização'
+    }
+    
+    resultados = {}
+    
+    # Realiza ANOVA para cada métrica
+    for coluna, nome in metricas.items():
+        # Separa dados por organização
+        grupos = [
+            df[df['organização'] == org][coluna].values
+            for org in ['facebook', 'microsoft', 'google']
+        ]
+        
+        # Realiza o teste ANOVA
+        f_stat, p_valor = stats.f_oneway(*grupos)
+        
+        # Interpreta o resultado
+        interpretacao = (
+            "Há diferença significativa entre as organizações"
+            if p_valor < 0.05
+            else "Não há diferença significativa entre as organizações"
+        )
+        
+        resultados[nome] = (f_stat, p_valor, interpretacao)
+        
+        print(f"\nANOVA - {nome}")
+        print(f"Estatística F: {f_stat:.4f}")
+        print(f"P-valor: {p_valor:.4f}")
+        print(f"Interpretação: {interpretacao}")
+    
+    # Salva resultados em CSV
+    with open('resultados_anova.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Métrica', 'Estatística F', 'P-valor', 'Interpretação'])
+        for metrica, (f_stat, p_valor, interp) in resultados.items():
+            writer.writerow([metrica, f_stat, p_valor, interp])
+    
+    print("\nResultados salvos em 'resultados_anova.csv'")
+    return resultados
+
 if __name__ == "__main__":
+    # Primeiro coleta os dados
     get_top_repos_data()
+    
+    # Depois realiza os testes ANOVA
+    realizar_testes_anova()
