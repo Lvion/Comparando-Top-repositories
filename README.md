@@ -1,5 +1,7 @@
 # Relatório de Análise dos Top-10 Repositórios
 
+##Autores: Pedro Motta e Vítor Lion
+
 ## Introdução
 
 O desenvolvimento open source tem ganhado enorme popularidade nas últimas décadas, quebrando barreiras comerciais e proporcionando colaboração entre empresas e comunidades globais. Organizações como Facebook, Microsoft e Google têm adotado estratégias de open source em diversas áreas, colaborando com a comunidade para criar ferramentas e APIs amplamente utilizadas. Um exemplo notável é o React, desenvolvido pelo Facebook, que se tornou um dos frameworks mais utilizados para construção de interfaces web.
