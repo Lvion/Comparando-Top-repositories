@@ -1,6 +1,6 @@
 # Relatório de Análise dos Top-10 Repositórios
 
-##Autores: Pedro Motta e Vítor Lion
+## Autores: Pedro Motta e Vítor Lion
 
 ## Introdução
 
